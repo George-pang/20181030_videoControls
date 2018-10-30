@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>视频播放</title>
+    <!--字体图标库-->
+    <link rel="stylesheet" href="css/font-awesome.css" />
+    <link rel="stylesheet" href="css/player.css" />
+</head>
+
+<body>
+    <figure>
+        <figcaption>视频播放器</figcaption>
+        <div class="player">
+            <video src="./video/fun.mp4"></video>
+            <div class="controls">
+                <!--播放/暂停-->
+                <a href="javascript:;" class="switch fa fa-play"></a>
+                <!--播放进度-->
+                <div class="progress">
+                    <div class="line"></div>
+                    <div class="bar"></div>
+                </div>
+                <!--当前播放时间/播放总时长-->
+                <div class="timer">
+                    <span class="current">00:00:00</span> / <span class="total">00:00:00</span>
+                </div>
+                <!--全屏/取消全屏-->
+                <a href="javascript:;" class="expand fa fa-arrows-alt"></a>
+            </div>
+        </div>
+    </figure>
+    <script src="./js/jquery.min.js"></script>
+    <script>
+        // 注意原生DOM对象方法和jq对象方法不能混用
+        var videoObj = $("video")[0]; //目的：调用原生video对象的方法、属性、事件
+        var totalTime;
+        // 定义函数：时间格式化
+        function formatTime(time) {
+            var h = Math.floor(time / 3600); //向下取整
+            var m = Math.floor(time % 3600 / 60);
+            var s = Math.floor(time % 60);
+            return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        /* 1、浏览器可以开始播放视频时显示video */
+        // canplay事件	当浏览器可以开始播放音频/视频时触发
+        videoObj.oncanplay = function () {
+            $(this).show();
+
+            /* 显示视频总长 ---写在canplay事件内，防止还没开始播放视频时获取到的视频长度无效*/
+            // duration属性	返回当前音频/视频的长度（以秒计）
+            totalTime = videoObj.duration;
+            $(".total").html(formatTime(totalTime));
+        }
+        /* 2、播放暂停*/
+        $(".switch").on("click", function () {
+            // paused属性	设置或返回音频/视频是否暂停
+            if (videoObj.paused) {
+                videoObj.play();
+                //同时切换播放按钮的样式
+                $(this).addClass("fa-pause").removeClass("fa-play");
+            } else {
+                videoObj.pause();
+                $(this).addClass("fa-play").removeClass("fa-pause");
+            }
+        });
+
+        /* 3、显示进度条---timeupdate事件-当目前的播放位置(即currentTime属性值)已更改时触发。*/
+        videoObj.ontimeupdate = function () {
+            //获取当前播放位置--currentTime属性	设置或返回音频/视频中的当前播放位置（以秒计）。
+            var currentTime = videoObj.currentTime;
+            // 显示当前时间
+            $(".current").html(formatTime(currentTime));
+            // 进度条
+            var lineWidth = currentTime / totalTime * 100 + "%";
+            $(".line").css("width", lineWidth);
+        };
+
+        /*4、全屏*/
+        $(".expand").on("click", function () {
+            // 暂时只考虑webkit内核浏览器---取消、检测全屏都是document对象调用方法，且检测全屏是属性，不是方法
+            if (document.webkitIsFullScreen) {
+                document.webkitCancelFullScreen();
+                $(this).addClass("fa-arrows-alt").removeClass("fa-compress");
+            } else {
+                $(".player")[0].webkitRequestFullScreen();
+                $(this).addClass("fa-compress").removeClass("fa-arrows-alt");
+            }
+        });
+
+        /*5、点击进度条跃进*/
+        $(".bar").on("click", function (event) {
+            var x = event.offsetX;
+            videoObj.currentTime = x / $(".bar").width() * totalTime;
+        });
+        
+        /*6、播放完成重置-ended事件*/
+        videoObj.onended=function(){
+            //当前播放时间归0
+            this.currentTime=0;
+            //播放按钮回复暂停样式
+            $(".switch").addClass("fa-play").removeClass("fa-pause");
+        };
+
+    </script>
+</body>
+
+</html>
