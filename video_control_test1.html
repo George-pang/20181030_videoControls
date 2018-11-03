@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <title>气象影视</title>
+    <link rel="stylesheet" href="css/common.css" type="text/css">
+    <link rel="stylesheet" href="css/video.css" type="text/css">
+    <link rel="stylesheet" href="iconfont/iconfont.css">
+    <link rel="stylesheet" href="css/controls.css">
+</head>
+
+<body>
+    <div class="page-hd">
+        <div class="back">
+            <a href="#">
+                <!-- <img src="img/back.png" alt=""> -->
+            </a>
+        </div>
+        <span class="pg-title">气象影视</span>
+    </div>
+    <div class="wrapper">
+        <div class="container">
+            <div class="video-item">
+                <div class="video">
+                    <video src="video/fun.mp4" poster="images/img1.jpg" id="1"></video>
+                    <div class="controls">
+                        <!--播放/暂停-->
+                        <a href="javascript:;" class="switch iconfont icon-bofang"></a>
+                        <!--播放进度-->
+                        <div class="progress">
+                            <div class="line"></div>
+                            <div class="bar"></div>
+                        </div>
+                        <!--当前播放时间/播放总时长-->
+                        <div class="timer">
+                            <span class="current">00:00:00</span> / <span class="total">00:00:00</span>
+                        </div>
+                        <!-- 静音/取消静音 -->
+                        <a href="javascript:;" class="mute iconfont icon-shengyin"></a>
+                        <!--全屏/取消全屏-->
+                        <a href="javascript:;" class="expand iconfont icon-quanping"></a>
+                    </div>
+                </div>
+                <div class="title">
+                    2018年8月3号城市预报
+                </div>
+            </div>
+            <!-- 原生video控件样式 -->
+            <div class="video-item">
+                <div class="video">
+                    <video src="video/fun.mp4" poster="images/img1.jpg" controls></video>
+                </div>
+                <div class="title">
+                    2018年8月3号城市预报
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script>
+        var videoObj = $("video")[0]; 
+        var totalTime;
+        // 定义函数：时间格式化
+        function formatTime(time) {
+            var h = Math.floor(time / 3600); //向下取整
+            var m = Math.floor(time % 3600 / 60);
+            var s = Math.floor(time % 60);
+            return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        /* 1、浏览器可以开始播放视频时显示video */
+        videoObj.oncanplay = function () {
+            $(this).show();
+            totalTime = videoObj.duration;
+            $(".total").html(formatTime(totalTime));
+        }
+        /* 2、播放暂停*/
+        $(".switch").on("click", function () {
+            if (videoObj.paused) {
+                videoObj.play();
+                //同时切换播放按钮的样式
+                $(this).addClass("icon-zanting").removeClass("icon-bofang");
+            } else {
+                videoObj.pause();
+                $(this).addClass("icon-bofang").removeClass("icon-zanting");
+            }
+        });
+
+        /* 3、显示进度条---timeupdate事件-当目前的播放位置(即currentTime属性值)已更改时触发。*/
+        videoObj.ontimeupdate = function () {
+            //获取当前播放位置--currentTime属性	设置或返回音频/视频中的当前播放位置（以秒计）。
+            var currentTime = videoObj.currentTime;
+            // 显示当前时间
+            $(".current").html(formatTime(currentTime));
+            // 进度条
+            var lineWidth = currentTime / totalTime * 100 + "%";
+            $(".line").css("width", lineWidth);
+        };
+
+        /*4、全屏*/
+        $(".expand").on("click", function () {
+            if (document.webkitIsFullScreen) {
+                document.webkitCancelFullScreen();
+                $(this).addClass("icon-quanping").removeClass("icon-suoxiao");
+            } else {
+                $(this).parent().parent().get(0).webkitRequestFullScreen();//完善：控制所有视频事件
+                $(this).addClass("icon-suoxiao").removeClass("icon-quanping");
+            }
+        });
+
+        /*5、点击进度条跃进*/
+        $(".bar").on("click", function (event) {
+            var x = event.offsetX;
+            videoObj.currentTime = x / $(".bar").width() * totalTime;
+        });
+
+        /* 6、静音 */
+        $(".mute").on("click",function(){
+            if(videoObj.muted){
+                videoObj.muted=false;
+                $(this).addClass("icon-shengyin").removeClass("icon-jingyin");
+            }else{
+                videoObj.muted=true;
+                $(this).addClass("icon-jingyin").removeClass("icon-shengyin");
+            }
+        });
+        
+        /*7、播放完成重置-ended事件*/
+        videoObj.onended=function(){
+            this.currentTime=0;
+            $(".switch").addClass("icon-zanting").removeClass("icon-bofang");
+        };
+
+    </script>
+</body>
+
+</html>

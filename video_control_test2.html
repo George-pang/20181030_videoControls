@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<!-- video思路2：video盒子下就显示一张图片，上面一个play按钮，当点击play时，原先全屏的video显示出来-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+    <title>气象影视</title>
+    <link rel="stylesheet" href="css/common.css" type="text/css">
+    <link rel="stylesheet" href="css/video2.css" type="text/css">
+    <script src="js/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="page-hd">
+        <div class="back">
+            <a href="#">
+            </a>
+        </div>
+        <span class="pg-title">气象影视</span>
+    </div>
+    <div class="wrapper">
+        <div class="container">
+            <div class="video-item">
+                <div class="video">
+                    <!-- <video src="movie.mp4" poster="tpl/Wap/default/common/huangshan/images/img1.jpg" controls></video> -->
+                    <img src="images/img1.jpg" alt="">
+                    <div class="btn-play">
+                        <img src="images/bofang.png" alt="">
+                    </div>
+                    <!-- 全屏video--初始隐藏 -->
+                    <div class="fullScreen">
+                        <div class="btn-exit">
+                            <img src="images/exit-fullscreen.png" alt="">
+                        </div>
+                        <video src="video/fun.mp4" controls></video>
+                    </div>
+                </div>
+                <div class="title">
+                    2018年8月3号城市预报
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            $(".btn-play").on("click", function () {
+                $(this).siblings(".fullScreen").show();
+                $(this).siblings(".fullScreen").find("video").get(0).play();
+                $(".btn-exit").on("click", function () {
+                    $(this).parent().hide();
+                    return false;
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
